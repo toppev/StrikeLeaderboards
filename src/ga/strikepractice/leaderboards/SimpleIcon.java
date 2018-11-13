@@ -9,6 +9,7 @@ public class SimpleIcon {
 	private String tag;
 	private int slot;
 	
+	
 	public SimpleIcon(ItemStack item, String tag, int slot) {
 		this.tag = tag.toLowerCase().replace("-", "_");
 		this.slot = slot;
@@ -25,5 +26,17 @@ public class SimpleIcon {
 	
 	public int getSlot() {
 		return slot;
+	}
+	
+	public void setItem(ItemStack item) {
+		this.item = item;
+	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+	
+	public void setSlot(int slot) {
+		this.slot = slot;
 	}
 }

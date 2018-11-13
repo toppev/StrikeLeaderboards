@@ -26,28 +26,28 @@ import ga.strikepractice.stats.Stats;
 
 public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandExecutor {
 
-	
+
 	private String title, format;
 	private int leaderboardSize;
-	
+
 	private final List<SimpleIcon> statItems = new ArrayList<SimpleIcon>();
 
-	
+
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
-	
+
 		title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
 		format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
 		leaderboardSize = getConfig().getInt("leaderboard-size");
-		
+
 		addItem("kills");
 		addItem("deaths");
 		addItem("global-elo");
 		addItem("lms");
 		addItem("brackets");
 		addItem("party-vs-party-wins");
-		
+
 		Bukkit.getPluginManager().registerEvents(this, this);
 		getCommand("leaderboards").setExecutor(this);
 	}
@@ -78,21 +78,19 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
 	private void openGUI(Player p) {
 		Inventory inv = Bukkit.createInventory(null, getSize(), title);
-		try {
-			int slot = 0;
-			for(SimpleIcon icon : statItems) {
-				ItemStack item = icon.getItem();
-				inv.setItem(icon.getSlot(), applyTop(item, icon.getTag()));
+		int slot = 0;
+		for(SimpleIcon icon : statItems) {
+			ItemStack item = icon.getItem();
+			inv.setItem(icon.getSlot(), applyTop(item, icon.getTag()));
+			slot++;
+		}
+		if(!statItems.isEmpty()) slot = 18;
+		for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
+			if(kit.isElo() && kit.getIcon() != null) {
+				inv.setItem(slot, applyTop(kit.getIcon().clone(), Stats.elo(kit.getName())));
 				slot++;
 			}
-			if(!statItems.isEmpty()) slot = 18;
-			for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
-				if(kit.isElo() && kit.getIcon() != null) {
-					inv.setItem(slot, applyTop(kit.getIcon().clone(), Stats.elo(kit.getName())));
-					slot++;
-				}
-			}
-		}catch(Exception e) {}
+		}
 		p.openInventory(inv);
 	}
 
