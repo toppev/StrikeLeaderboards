@@ -61,7 +61,8 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		if(e.getInventory() != null && e.getInventory().getTitle().equalsIgnoreCase(title)) {
+		if(e.getInventory() != null && e.getInventory().getTitle() != null 
+				&& e.getInventory().getTitle().equals(title)) {
 			e.setCancelled(true);
 		}
 	}
