@@ -1,0 +1,63 @@
+title: '&cLeaderboards'
+format: '&6#<place>: &e<player> - <value>'
+leaderboard-size: 10
+kills:
+  display: true
+  slot: 0
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: DIAMOND_SWORD
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Kills"
+deaths:
+  display: true
+  slot: 1
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: SKULL_ITEM
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Deaths"
+global-elo:
+  display: true
+  slot: 2
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: GOLD_INGOT
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Global ELO"
+lms:
+  display: true
+  slot: 3
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: BEACON
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Last Man Standing Wins"
+party-vs-party-wins:
+  display: true
+  slot: 4
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: EMERALD
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Party Vs Party Wins"
+brackets:
+  display: true
+  slot: 5
+  item:
+    ==: org.bukkit.inventory.ItemStack
+    type: IRON_FENCE
+    meta:
+      ==: ItemMeta
+      meta-type: UNSPECIFIC
+      display-name: "\xa79\xa7lTop Brackets Wins"
