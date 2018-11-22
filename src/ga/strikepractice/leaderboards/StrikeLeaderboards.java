@@ -1,10 +1,12 @@
 package ga.strikepractice.leaderboards;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -30,7 +32,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 	private String title, format;
 	private int leaderboardSize;
 
-	private final List<SimpleIcon> statItems = new ArrayList<SimpleIcon>();
+	private final HashSet<SimpleIcon> statItems = new HashSet<SimpleIcon>();
 
 
 	@Override
@@ -38,16 +40,20 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 		saveDefaultConfig();
 
 		title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
+		Validate.notNull(title, "'title' can not be null");
+		
 		format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
+		Validate.notNull(title, "'format' can not be null");
+		
 		leaderboardSize = getConfig().getInt("leaderboard-size");
-
+		
 		addItem("kills");
 		addItem("deaths");
 		addItem("global-elo");
 		addItem("lms");
 		addItem("brackets");
 		addItem("party-vs-party-wins");
-
+		
 		Bukkit.getPluginManager().registerEvents(this, this);
 		getCommand("leaderboards").setExecutor(this);
 	}
@@ -73,29 +79,32 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 		if(sender instanceof Player) {
 			openGUI((Player) sender);
 		}
+		else {
+			sender.sendMessage("Console can not execute that command.");
+		}
 		return true;
 	}
 
 
 	private void openGUI(Player p) {
-		Inventory inv = Bukkit.createInventory(null, getSize(), title);
+		Inventory inv = Bukkit.createInventory(null, getInventorySize(), title);
 		int slot = 0;
 		for(SimpleIcon icon : statItems) {
 			ItemStack item = icon.getItem();
-			inv.setItem(icon.getSlot(), applyTop(item, icon.getTag()));
+			inv.setItem(icon.getSlot(), applyTopLore(item, icon.getTag()));
 			slot++;
 		}
 		if(!statItems.isEmpty()) slot = 18;
 		for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
 			if(kit.isElo() && kit.getIcon() != null) {
-				inv.setItem(slot, applyTop(kit.getIcon().clone(), Stats.elo(kit.getName())));
+				inv.setItem(slot, applyTopLore(kit.getIcon().clone(), Stats.elo(kit.getName())));
 				slot++;
 			}
 		}
 		p.openInventory(inv);
 	}
 
-	private ItemStack applyTop(ItemStack item, String top) {
+	private ItemStack applyTopLore(ItemStack item, String top) {
 		ItemMeta meta = item.getItemMeta();
 		LinkedHashMap<String, Double> list = PlayerStats.getTop().getOrDefault(top, new LinkedHashMap<String, Double>());
 		List<String> lore = new ArrayList<String>();
@@ -113,7 +122,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 		return item;
 	}
 
-	private int getSize() {
+	private int getInventorySize() {
 		int size = 0;
 		for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
 			if(kit.isElo() && kit.getIcon() != null) {
