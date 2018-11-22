@@ -41,7 +41,6 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
 		title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
 		Validate.notNull(title, "'title' can not be null");
-		
 		format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
 		Validate.notNull(title, "'format' can not be null");
 		
