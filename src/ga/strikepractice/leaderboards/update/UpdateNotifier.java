@@ -60,14 +60,14 @@ public class UpdateNotifier implements Listener {
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             conn.connect();
-            BufferedReader localBufferedReader = new BufferedReader(
+            BufferedReader reader = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), Charset.forName("UTF-8")));
-            StringBuilder localStringBuilder = new StringBuilder();
+            StringBuilder builder = new StringBuilder();
             String str1;
-            while ((str1 = localBufferedReader.readLine()) != null) {
-                localStringBuilder.append(str1);
+            while ((str1 = reader.readLine()) != null) {
+                builder.append(str1);
             }
-            String str2 = localStringBuilder.toString();
+            String str2 = builder.toString();
             if (!plugin.getDescription().getVersion().equals(str2)) {
                 updateAvailable = true;
                 Bukkit.getLogger().info("There is a new update available for " + plugin.getDescription().getName());
