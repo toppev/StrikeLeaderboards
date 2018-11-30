@@ -1,6 +1,8 @@
 title: '&cLeaderboards'
 format: '&6#<place>: &e<player> - <value>'
 leaderboard-size: 10
+#will notify operators
+notify-updates: true
 kills:
   display: true
   slot: 0
