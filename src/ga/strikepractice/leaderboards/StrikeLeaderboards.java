@@ -23,118 +23,125 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ga.strikepractice.StrikePracticeAPI;
 import ga.strikepractice.battlekit.BattleKit;
+import ga.strikepractice.leaderboards.util.UpdateNotifier;
 import ga.strikepractice.stats.PlayerStats;
 import ga.strikepractice.stats.Stats;
 
 public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandExecutor {
 
+    private String title, format;
+    private int leaderboardSize;
 
-	private String title, format;
-	private int leaderboardSize;
+    private final HashSet<SimpleIcon> statItems = new HashSet<SimpleIcon>();
 
-	private final HashSet<SimpleIcon> statItems = new HashSet<SimpleIcon>();
+    @Override
+    public void onEnable() {
+        saveDefaultConfig();
 
+        title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
+        Validate.notNull(title, "'title' can not be null");
 
-	@Override
-	public void onEnable() {
-		saveDefaultConfig();
+        format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
+        Validate.notNull(title, "'format' can not be null");
 
-		title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
-		Validate.notNull(title, "'title' can not be null");
-		
-		format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
-		Validate.notNull(title, "'format' can not be null");
-		
-		leaderboardSize = getConfig().getInt("leaderboard-size");
-		
-		addItem("kills");
-		addItem("deaths");
-		addItem("global-elo");
-		addItem("lms");
-		addItem("brackets");
-		addItem("party-vs-party-wins");
-		
-		Bukkit.getPluginManager().registerEvents(this, this);
-		getCommand("leaderboards").setExecutor(this);
-	}
+        leaderboardSize = getConfig().getInt("leaderboard-size");
 
-	private void addItem(String name) {
-		if(getConfig().getBoolean(name + ".display")) {
-			statItems.add(new SimpleIcon(getConfig().getItemStack(name + ".item"), name, getConfig().getInt(name + ".slot")));
-		}
-	}
+        addItem("kills");
+        addItem("deaths");
+        addItem("global-elo");
+        addItem("lms");
+        addItem("brackets");
+        addItem("party-vs-party-wins");
 
+        Bukkit.getPluginManager().registerEvents(this, this);
+        getCommand("leaderboards").setExecutor(this);
 
-	@EventHandler
-	public void onClick(InventoryClickEvent e) {
-		if(e.getInventory() != null && e.getInventory().getTitle() != null 
-				&& e.getInventory().getTitle().equals(title)) {
-			e.setCancelled(true);
-		}
-	}
+        new UpdateNotifier(this, 59356, getConfig().getBoolean("notify-updates"));
+    }
 
+    private void addItem(String name) {
+        if (getConfig().getBoolean(name + ".display")) {
+            statItems.add(
+                    new SimpleIcon(getConfig().getItemStack(name + ".item"), name, getConfig().getInt(name + ".slot")));
+        }
+    }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(sender instanceof Player) {
-			openGUI((Player) sender);
-		}
-		else {
-			sender.sendMessage("Console can not execute that command.");
-		}
-		return true;
-	}
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        if (e.getInventory() != null && e.getInventory().getTitle() != null
+                && e.getInventory().getTitle().equals(title)) {
+            e.setCancelled(true);
+        }
+    }
 
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            openGUI((Player) sender);
+        } else {
+            sender.sendMessage("Console can not execute that command.");
+        }
+        return true;
+    }
 
-	private void openGUI(Player p) {
-		Inventory inv = Bukkit.createInventory(null, getInventorySize(), title);
-		int slot = 0;
-		for(SimpleIcon icon : statItems) {
-			ItemStack item = icon.getItem();
-			inv.setItem(icon.getSlot(), applyTopLore(item, icon.getTag()));
-			slot++;
-		}
-		if(!statItems.isEmpty()) slot = 18;
-		for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
-			if(kit.isElo() && kit.getIcon() != null) {
-				inv.setItem(slot, applyTopLore(kit.getIcon().clone(), Stats.elo(kit.getName())));
-				slot++;
-			}
-		}
-		p.openInventory(inv);
-	}
+    private void openGUI(Player p) {
+        Inventory inv = Bukkit.createInventory(null, getInventorySize(), title);
+        int slot = 0;
+        for (SimpleIcon icon : statItems) {
+            ItemStack item = icon.getItem();
+            inv.setItem(icon.getSlot(), applyTopLore(item, icon.getTag()));
+            slot++;
+        }
+        if (!statItems.isEmpty())
+            slot = 18;
+        for (BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
+            if (kit.isElo() && kit.getIcon() != null) {
+                inv.setItem(slot, applyTopLore(kit.getIcon().clone(), Stats.elo(kit.getName())));
+                slot++;
+            }
+        }
+        p.openInventory(inv);
+    }
 
-	private ItemStack applyTopLore(ItemStack item, String top) {
-		ItemMeta meta = item.getItemMeta();
-		LinkedHashMap<String, Double> list = PlayerStats.getTop().getOrDefault(top, new LinkedHashMap<String, Double>());
-		List<String> lore = new ArrayList<String>();
-		if(list != null) {
-			int i = 1;
-			for(Entry<String, Double> e : list.entrySet()) {
-				if(i <= leaderboardSize) {
-					lore.add(format.replace("<place>", i + "").replace("<player>", e.getKey()).replace("<value>", e.getValue().intValue() + ""));
-				}
-				i++;
-			}
-		}
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		return item;
-	}
+    private ItemStack applyTopLore(ItemStack item, String top) {
+        ItemMeta meta = item.getItemMeta();
+        LinkedHashMap<String, Double> list = PlayerStats.getTop().getOrDefault(top,
+                new LinkedHashMap<String, Double>());
+        List<String> lore = new ArrayList<String>();
+        if (list != null) {
+            int i = 1;
+            for (Entry<String, Double> e : list.entrySet()) {
+                if (i <= leaderboardSize) {
+                    lore.add(format.replace("<place>", i + "").replace("<player>", e.getKey()).replace("<value>",
+                            e.getValue().intValue() + ""));
+                }
+                i++;
+            }
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
 
-	private int getInventorySize() {
-		int size = 0;
-		for(BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
-			if(kit.isElo() && kit.getIcon() != null) {
-				size++;
-			}
-		}
-		if(!statItems.isEmpty()) size += 18;
-		if (size <= 9) return 9;
-		if (size <= 18) return 18;
-		if (size <= 27) return 27;
-		if (size <= 36) return 36;
-		if (size <= 45) return 45;
-		return 54;
-	}
+    private int getInventorySize() {
+        int size = 0;
+        for (BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
+            if (kit.isElo() && kit.getIcon() != null) {
+                size++;
+            }
+        }
+        if (!statItems.isEmpty())
+            size += 18;
+        if (size <= 9)
+            return 9;
+        if (size <= 18)
+            return 18;
+        if (size <= 27)
+            return 27;
+        if (size <= 36)
+            return 36;
+        if (size <= 45)
+            return 45;
+        return 54;
+    }
 }
