@@ -23,7 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ga.strikepractice.StrikePracticeAPI;
 import ga.strikepractice.battlekit.BattleKit;
-import ga.strikepractice.leaderboards.util.UpdateNotifier;
+import ga.strikepractice.leaderboards.update.UpdateNotifier;
 import ga.strikepractice.stats.PlayerStats;
 import ga.strikepractice.stats.Stats;
 

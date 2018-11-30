@@ -1,4 +1,4 @@
-package ga.strikepractice.leaderboards.util;
+package ga.strikepractice.leaderboards.update;
 
 import java.io.BufferedReader;
 import java.io.IOException;
