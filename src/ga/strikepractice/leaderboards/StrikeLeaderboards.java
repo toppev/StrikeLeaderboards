@@ -12,7 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,13 +37,10 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
     @Override
     public void onEnable() {
         saveDefaultConfig();
-
         title = ChatColor.translateAlternateColorCodes('&', getConfig().getString("title"));
         Validate.notNull(title, "'title' can not be null");
-
         format = ChatColor.translateAlternateColorCodes('&', getConfig().getString("format"));
         Validate.notNull(title, "'format' can not be null");
-
         leaderboardSize = getConfig().getInt("leaderboard-size");
 
         // addItem("kills");
@@ -53,11 +49,11 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         // addItem("lms");
         // addItem("brackets");
         // addItem("party-vs-party-wins");
-        
+
         getConfig().getKeys(false).stream().filter(path -> getConfig().isConfigurationSection(path))
                 .forEach(path -> addItem(path));
 
-        Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager(). registerEvents(this, this);
         getCommand("strikeleaderboards").setExecutor(this);
 
         new UpdateNotifier(this, 59356, getConfig().getBoolean("notify-updates"));
@@ -65,8 +61,12 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
     private void addItem(String name) {
         if (getConfig().getBoolean(name + ".display")) {
-            statItems.add(
-                    new SimpleIcon(getConfig().getItemStack(name + ".item"), name, getConfig().getInt(name + ".slot")));
+            ItemStack item = getConfig().getItemStack(name + ".item");
+            Validate.notNull(item, name + ".item can not be null");
+            Validate.isTrue(getConfig().isSet(name + ".slot"));
+            int slot = getConfig().getInt(name + ".slot");
+            Validate.isTrue(slot > 0, name + ".slot is not positive");
+            statItems.add(new SimpleIcon(item, name, slot));
         }
     }
 
