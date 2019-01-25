@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,12 +47,15 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
         leaderboardSize = getConfig().getInt("leaderboard-size");
 
-        addItem("kills");
-        addItem("deaths");
-        addItem("global-elo");
-        addItem("lms");
-        addItem("brackets");
-        addItem("party-vs-party-wins");
+        // addItem("kills");
+        // addItem("deaths");
+        // addItem("global-elo");
+        // addItem("lms");
+        // addItem("brackets");
+        // addItem("party-vs-party-wins");
+        
+        getConfig().getKeys(false).stream().filter(path -> getConfig().isConfigurationSection(path))
+                .forEach(path -> addItem(path));
 
         Bukkit.getPluginManager().registerEvents(this, this);
         getCommand("strikeleaderboards").setExecutor(this);
