@@ -4,8 +4,8 @@ version: 1.0
 depend: [StrikePractice]
 author: Toppe5
 commands:
-  leaderboards:
-    aliases: [topelo, leaderboard]
+  strikeleaderboards:
+    aliases: [topelo, leaderboard, leaderboards]
     permission: strikeleaderboards.leaderboards
 permissions:
   strikeleaderboards.leaderboards:

@@ -54,7 +54,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         addItem("party-vs-party-wins");
 
         Bukkit.getPluginManager().registerEvents(this, this);
-        getCommand("leaderboards").setExecutor(this);
+        getCommand("strikeleaderboards").setExecutor(this);
 
         new UpdateNotifier(this, 59356, getConfig().getBoolean("notify-updates"));
     }
