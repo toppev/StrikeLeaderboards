@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,13 +20,13 @@ public class UpdateNotifier implements Listener {
     private boolean updateAvailable;
 
     private final JavaPlugin plugin;
-    private final String API_URL;
-    private final String UPDATES_URL;
+    private final String apiURL;
+    private final String updatesURL;
 
     public UpdateNotifier(JavaPlugin plugin, int resourceId, boolean notifyStaff) {
         this.plugin = plugin;
-        API_URL = "https://api.spigotmc.org/legacy/update.php?resource=" + resourceId + "/";
-        UPDATES_URL = "https://www.spigotmc.org/resources/" + resourceId + "/updates";
+        apiURL = "https://api.spigotmc.org/legacy/update.php?resource=" + resourceId + "/";
+        updatesURL = "https://www.spigotmc.org/resources/" + resourceId + "/updates";
         if (notifyStaff) {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
@@ -38,7 +38,7 @@ public class UpdateNotifier implements Listener {
         if (e.getPlayer().isOp() && updateAvailable) {
             e.getPlayer().sendMessage(ChatColor.GRAY + "There is a new update available for " + ChatColor.AQUA
                     + plugin.getDescription().getName() + ChatColor.GRAY + ".");
-            e.getPlayer().sendMessage(ChatColor.GRAY + "Link: " + UPDATES_URL);
+            e.getPlayer().sendMessage(ChatColor.GRAY + "Link: " + updatesURL);
         }
     }
 
@@ -54,14 +54,14 @@ public class UpdateNotifier implements Listener {
 
     public boolean checkUpdates() {
         try {
-            URLConnection conn = new URL(API_URL).openConnection();
+            URLConnection conn = new URL(apiURL).openConnection();
             conn.setRequestProperty("User-Agent",
                     "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             conn.connect();
             BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), Charset.forName("UTF-8")));
+                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             StringBuilder builder = new StringBuilder();
             String str1;
             while ((str1 = reader.readLine()) != null) {
@@ -71,7 +71,7 @@ public class UpdateNotifier implements Listener {
             if (!plugin.getDescription().getVersion().equals(str2)) {
                 updateAvailable = true;
                 Bukkit.getLogger().info("There is a new update available for " + plugin.getDescription().getName());
-                Bukkit.getLogger().info("Link: " + UPDATES_URL);
+                Bukkit.getLogger().info("Link: " + updatesURL);
             }
         } catch (IOException e) {
             Bukkit.getLogger().warning("Failed to check updates for " + plugin.getDescription().getName() + " "

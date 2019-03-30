@@ -32,7 +32,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
     private String title, format;
     private int leaderboardSize;
 
-    private final HashSet<SimpleIcon> statItems = new HashSet<SimpleIcon>();
+    private final HashSet<SimpleIcon> statItems = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -43,17 +43,10 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         Validate.notNull(title, "'format' can not be null");
         leaderboardSize = getConfig().getInt("leaderboard-size");
 
-        // addItem("kills");
-        // addItem("deaths");
-        // addItem("global-elo");
-        // addItem("lms");
-        // addItem("brackets");
-        // addItem("party-vs-party-wins");
-
         getConfig().getKeys(false).stream().filter(path -> getConfig().isConfigurationSection(path))
-                .forEach(path -> addItem(path));
+                .forEach(this::addItem);
 
-        Bukkit.getPluginManager(). registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(this, this);
         getCommand("strikeleaderboards").setExecutor(this);
 
         new UpdateNotifier(this, 59356, getConfig().getBoolean("notify-updates"));
@@ -96,8 +89,9 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
             inv.setItem(icon.getSlot(), applyTopLore(item, icon.getTag()));
             slot++;
         }
-        if (!statItems.isEmpty())
+        if (!statItems.isEmpty()) {
             slot = 18;
+        }
         for (BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
             if (kit.isElo() && kit.getIcon() != null) {
                 inv.setItem(slot, applyTopLore(kit.getIcon().clone(), Stats.elo(kit.getName())));
@@ -111,7 +105,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         ItemMeta meta = item.getItemMeta();
         LinkedHashMap<String, Double> list = PlayerStats.getTop().getOrDefault(top,
                 new LinkedHashMap<String, Double>());
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         if (list != null) {
             int i = 1;
             for (Entry<String, Double> e : list.entrySet()) {
@@ -134,18 +128,24 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
                 size++;
             }
         }
-        if (!statItems.isEmpty())
+        if (!statItems.isEmpty()) {
             size += 18;
-        if (size <= 9)
+        }
+        if (size <= 9) {
             return 9;
-        if (size <= 18)
+        }
+        if (size <= 18) {
             return 18;
-        if (size <= 27)
+        }
+        if (size <= 27) {
             return 27;
-        if (size <= 36)
+        }
+        if (size <= 36) {
             return 36;
-        if (size <= 45)
+        }
+        if (size <= 45) {
             return 45;
+        }
         return 54;
     }
 }
