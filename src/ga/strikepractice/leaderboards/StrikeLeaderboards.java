@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ga.strikepractice.StrikePracticeAPI;
+import ga.strikepractice.StrikePractice;
 import ga.strikepractice.battlekit.BattleKit;
 import ga.strikepractice.leaderboards.update.UpdateNotifier;
-import ga.strikepractice.stats.PlayerStats;
+import ga.strikepractice.stats.DefaultPlayerStats;
 import ga.strikepractice.stats.Stats;
 
 public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandExecutor {
@@ -58,15 +58,14 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
             Validate.notNull(item, name + ".item can not be null");
             Validate.isTrue(getConfig().isSet(name + ".slot"));
             int slot = getConfig().getInt(name + ".slot");
-            Validate.isTrue(slot > 0, name + ".slot is not positive");
+            Validate.isTrue(slot >= 0, name + ".slot is not equal or greater than 0");
             statItems.add(new SimpleIcon(item, name, slot));
         }
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getInventory() != null && e.getInventory().getTitle() != null
-                && e.getInventory().getTitle().equals(title)) {
+        if (e.getView() != null && e.getView().getTitle() != null && e.getView().getTitle().equals(title)) {
             e.setCancelled(true);
         }
     }
@@ -92,7 +91,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         if (!statItems.isEmpty()) {
             slot = 18;
         }
-        for (BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
+        for (BattleKit kit : StrikePractice.getAPI().getKits()) {
             if (kit.isElo() && kit.getIcon() != null) {
                 inv.setItem(slot, applyTopLore(kit.getIcon().clone(), Stats.elo(kit.getName())));
                 slot++;
@@ -103,7 +102,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
     private ItemStack applyTopLore(ItemStack item, String top) {
         ItemMeta meta = item.getItemMeta();
-        LinkedHashMap<String, Double> list = PlayerStats.getTop().getOrDefault(top,
+        LinkedHashMap<String, Double> list = DefaultPlayerStats.getTop().getOrDefault(top,
                 new LinkedHashMap<String, Double>());
         List<String> lore = new ArrayList<>();
         if (list != null) {
@@ -123,7 +122,7 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
     private int getInventorySize() {
         int size = 0;
-        for (BattleKit kit : StrikePracticeAPI.getStrikePractice().kits) {
+        for (BattleKit kit : StrikePractice.getAPI().getKits()) {
             if (kit.isElo() && kit.getIcon() != null) {
                 size++;
             }
