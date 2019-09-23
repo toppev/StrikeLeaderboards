@@ -1,11 +1,10 @@
 package ga.strikepractice.leaderboards;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
+import ga.strikepractice.StrikePractice;
+import ga.strikepractice.battlekit.BattleKit;
+import ga.strikepractice.leaderboards.update.UpdateNotifier;
+import ga.strikepractice.stats.DefaultPlayerStats;
+import ga.strikepractice.stats.Stats;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,18 +20,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ga.strikepractice.StrikePractice;
-import ga.strikepractice.battlekit.BattleKit;
-import ga.strikepractice.leaderboards.update.UpdateNotifier;
-import ga.strikepractice.stats.DefaultPlayerStats;
-import ga.strikepractice.stats.Stats;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandExecutor {
+
+    private final Set<SimpleIcon> statItems = new HashSet<>();
 
     private String title, format;
     private int leaderboardSize;
 
-    private final HashSet<SimpleIcon> statItems = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -43,13 +40,30 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         Validate.notNull(title, "'format' can not be null");
         leaderboardSize = getConfig().getInt("leaderboard-size");
 
-        getConfig().getKeys(false).stream().filter(path -> getConfig().isConfigurationSection(path))
-                .forEach(this::addItem);
+        getConfig().getKeys(false).stream().filter(path -> getConfig().isConfigurationSection(path)).forEach(this::addItem);
 
         Bukkit.getPluginManager().registerEvents(this, this);
         getCommand("strikeleaderboards").setExecutor(this);
 
         new UpdateNotifier(this, 59356, getConfig().getBoolean("notify-updates"));
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            openGUI((Player) sender);
+        } else {
+            sender.sendMessage("Console can not execute that command.");
+        }
+        return true;
+    }
+
+
+    @EventHandler
+    public void onClick(InventoryClickEvent e) {
+        if (e.getView() != null && e.getView().getTitle() != null && e.getView().getTitle().equals(title)) {
+            e.setCancelled(true);
+        }
     }
 
     private void addItem(String name) {
@@ -61,23 +75,6 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
             Validate.isTrue(slot >= 0, name + ".slot is not equal or greater than 0");
             statItems.add(new SimpleIcon(item, name, slot));
         }
-    }
-
-    @EventHandler
-    public void onClick(InventoryClickEvent e) {
-        if (e.getView() != null && e.getView().getTitle() != null && e.getView().getTitle().equals(title)) {
-            e.setCancelled(true);
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            openGUI((Player) sender);
-        } else {
-            sender.sendMessage("Console can not execute that command.");
-        }
-        return true;
     }
 
     private void openGUI(Player p) {
@@ -102,15 +99,13 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
 
     private ItemStack applyTopLore(ItemStack item, String top) {
         ItemMeta meta = item.getItemMeta();
-        LinkedHashMap<String, Double> list = DefaultPlayerStats.getTop().getOrDefault(top,
-                new LinkedHashMap<String, Double>());
+        LinkedHashMap<String, Double> list = DefaultPlayerStats.getTop().getOrDefault(top, new LinkedHashMap<String, Double>());
         List<String> lore = new ArrayList<>();
         if (list != null) {
             int i = 1;
             for (Entry<String, Double> e : list.entrySet()) {
                 if (i <= leaderboardSize) {
-                    lore.add(format.replace("<place>", i + "").replace("<player>", e.getKey()).replace("<value>",
-                            e.getValue().intValue() + ""));
+                    lore.add(format.replace("<place>", i + "").replace("<player>", e.getKey()).replace("<value>", e.getValue().intValue() + ""));
                 }
                 i++;
             }
@@ -130,21 +125,11 @@ public class StrikeLeaderboards extends JavaPlugin implements Listener, CommandE
         if (!statItems.isEmpty()) {
             size += 18;
         }
-        if (size <= 9) {
-            return 9;
+        if (size > 54) {
+            return 54;
         }
-        if (size <= 18) {
-            return 18;
-        }
-        if (size <= 27) {
-            return 27;
-        }
-        if (size <= 36) {
-            return 36;
-        }
-        if (size <= 45) {
-            return 45;
-        }
-        return 54;
+        // If it's multiple of 9 return it, otherwise size + (9 - size % 9) will return the next multiple of 9
+        return size % 9 == 0 ? size : size + (9 - size % 9);
     }
+
 }
