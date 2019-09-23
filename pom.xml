@@ -43,11 +43,24 @@
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Use jitpack.io -->
+        <!-- Can't use jitpack.io yet, the StrikePracticeAPI doesn't have everything
         <dependency>
             <groupId>com.github.toppev</groupId>
             <artifactId>StrikePracticeAPI</artifactId>
             <version>01ef83e586</version>
+        </dependency>
+         -->
+        <dependency>
+            <groupId>ga</groupId>
+            <artifactId>StrikePractice</artifactId>
+            <scope>system</scope>
+            <systemPath>${user.home}/projects/java/StrikePractice.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
