@@ -51,7 +51,8 @@
         </dependency>
          -->
         <dependency>
-            <groupId>ga</groupId>
+            <groupId>ga.strikepractice</groupId>
+            <version>2.9.1</version>
             <artifactId>StrikePractice</artifactId>
             <scope>system</scope>
             <systemPath>${user.home}/projects/java/StrikePractice.jar</systemPath>
