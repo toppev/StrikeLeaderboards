@@ -1,0 +1,12 @@
+name: StrikeLeaderboards
+main: ga.strikepractice.leaderboards.StrikeLeaderboards
+version: 1.1
+depend: [StrikePractice]
+author: Toppe5
+commands:
+  strikeleaderboards:
+    aliases: [topelo, leaderboard, leaderboards]
+    permission: strikeleaderboards.leaderboards
+permissions:
+  strikeleaderboards.leaderboards:
+    default: true
