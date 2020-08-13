@@ -23,7 +23,7 @@ deaths:
       ==: ItemMeta
       meta-type: UNSPECIFIC
       display-name: "\xa79\xa7lTop Deaths"
-global-elo:
+global_elo:
   display: true
   slot: 2
   item:
